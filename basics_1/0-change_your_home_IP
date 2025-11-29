@@ -1,13 +1,24 @@
-#!/usr/bin/env bash
-# Configures local DNS resolution in /etc/hosts
+#!/bin/bash
+# File: 0-change_your_home_IP
+# Description: Change localhost IP to 127.0.0.2 or revert to 127.0.0.1
 
-# Add or replace localhost mapping
-sudo sed -i "s/^127\.0\.0\.1\s\+localhost/127.0.0.2 localhost/" /etc/hosts
+HOSTS_FILE="/etc/hosts"
+TARGET_IP="127.0.0.2"
+DEFAULT_IP="127.0.0.1"
+HOSTNAME="localhost"
 
-# If facebook.com already exists → replace
-# If not → append
-if grep -q "facebook.com" /etc/hosts; then
-    sudo sed -i "s/.*facebook.com/8.8.8.8 facebook.com/" /etc/hosts
+# Funksiya: cari IP-ni yoxlayır
+current_ip=$(grep -w "$HOSTNAME" $HOSTS_FILE | awk '{print $1}')
+
+if [ "$current_ip" == "$DEFAULT_IP" ]; then
+    # 127.0.0.1-dən 127.0.0.2-yə dəyiş
+    echo "Changing $HOSTNAME IP from $DEFAULT_IP to $TARGET_IP..."
+    sudo sed -i "s/$DEFAULT_IP/$TARGET_IP/" $HOSTS_FILE
+elif [ "$current_ip" == "$TARGET_IP" ]; then
+    # 127.0.0.2-dən geri 127.0.0.1-ə qaytar
+    echo "Reverting $HOSTNAME IP from $TARGET_IP to $DEFAULT_IP..."
+    sudo sed -i "s/$TARGET_IP/$DEFAULT_IP/" $HOSTS_FILE
 else
-    echo "8.8.8.8 facebook.com" | sudo tee -a /etc/hosts >/dev/null
+    echo "Current $HOSTNAME IP is $current_ip, not changing."
 fi
+
