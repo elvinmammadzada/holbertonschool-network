@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# Pings an IP address 5 times or shows usage if no argument is passed
 
-# Check if an argument is provided
-if [ $# -eq 0 ]; then
-    echo "Usage: 5-is_the_host_on_the_network {IP_ADDRESS}"
-    exit 1
+# Check if host is reachable
+if ping -c 5 "$1" > /dev/null 2>&1
+then
+    echo "$1 is up"
+else
+    echo "$1 is down"
 fi
 
-# Ping the IP address 5 times
-ping -c 5 "$1
